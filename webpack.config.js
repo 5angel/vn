@@ -1,6 +1,5 @@
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
-const CopyWebpackPlugin = require("copy-webpack-plugin");
 
 module.exports = {
   entry: {
@@ -28,24 +27,18 @@ module.exports = {
 
   output: {
     filename: "bundle.js",
-    path: path.resolve(__dirname, "dist"),
+    path: path.resolve(__dirname),
   },
 
   mode: "development",
 
   devServer: {
-    contentBase: path.resolve(__dirname, "dist"),
+    contentBase: path.resolve(__dirname),
   },
 
   plugins: [
-    new HtmlWebpackPlugin(),
-    new CopyWebpackPlugin({
-      patterns: [
-        {
-          from: path.resolve(__dirname, "src", "assets").replace(/\\/g, "/"),
-          to: path.resolve(__dirname, "dist", "assets").replace(/\\/g, "/"),
-        },
-      ],
+    new HtmlWebpackPlugin({
+      title: "ООО «Облачные Копыта»",
     }),
   ],
 };

@@ -1,4 +1,4 @@
-import "./assets/styles.css";
+import "./styles.css";
 
 type ImageMap = {
   [name: string]: HTMLImageElement;
