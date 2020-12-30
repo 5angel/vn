@@ -50,14 +50,14 @@ function appendSprite(name: string) {
 }
 
 async function main() {
-  title.innerText = "Косуля";
+  await preloadResources("bg1.jpg", "kosulya");
 
   document.body.appendChild(container);
   container.appendChild(bubble);
   bubble.appendChild(title);
   bubble.appendChild(text);
 
-  await preloadResources("bg1.jpg", "kosulya");
+  title.innerText = "Косуля";
 
   appendBg("bg1");
   appendSprite("kosulya");
