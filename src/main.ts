@@ -1,8 +1,13 @@
 import "./styles.css";
 
-type ImageMap = {
-  [name: string]: HTMLImageElement;
-};
+import { preloadResources } from "./utils";
+import Sprite from "./sprite";
+
+const sprites: {
+  [name: string]: Sprite;
+} = {};
+
+const config: Array<any> = require("./sprites.json");
 
 function createElement(id: string): HTMLDivElement {
   const element = document.createElement("div");
@@ -10,57 +15,37 @@ function createElement(id: string): HTMLDivElement {
   return element;
 }
 
-const container = createElement("container");
-const bubble = createElement("bubble");
-const title = createElement("title");
-const text = createElement("text");
-
-const resources: ImageMap = {};
-
-function preloadImage(url: string): Promise<HTMLImageElement> {
-  return new Promise((resolve, reject) => {
-    const image = new Image();
-    image.src = url;
-    image.onload = () => resolve(image);
-  });
-}
-
-async function preloadResources(...urls: string[]): Promise<ImageMap> {
-  for (let i = 0; i < urls.length; ++i) {
-    const filename = urls[i];
-    const [name, ext = "png"] = filename.split(".");
-    const image = await preloadImage(`assets/${name}.${ext}`);
-    resources[name] = image;
-  }
-  return resources;
-}
-
-function appendImage(name: string, className: string) {
-  const image = resources[name];
-  image.className = className;
-  container.appendChild(image);
-}
-
-function appendBg(name: string) {
-  return appendImage(name, "bg");
-}
-
-function appendSprite(name: string) {
-  return appendImage(name, "sprite");
-}
-
 async function main() {
-  await preloadResources("bg1.jpg", "kosulya");
+  const names = config.map(({ name }) => name);
+  const resources = await preloadResources("bg1.jpg", ...names);
+  Sprite.init(resources);
+
+  const container = createElement("container");
+  const bubble = createElement("bubble");
+  const title = createElement("title");
+  const text = createElement("text");
+  const scene = createElement("scene");
 
   document.body.appendChild(container);
+
+  const bg: HTMLImageElement = resources["bg1"];
+
+  container.appendChild(bg);
+  container.appendChild(scene);
   container.appendChild(bubble);
+
   bubble.appendChild(title);
   bubble.appendChild(text);
 
-  title.innerText = "Косуля";
+  config.forEach((data) => {
+    const { name } = data;
+    sprites[name] = new Sprite(data);
+  });
 
-  appendBg("bg1");
-  appendSprite("kosulya");
+  const kosulya = sprites["kosulya"];
+  const lisa = sprites["lisa"];
+  kosulya.enter();
+  lisa.enter();
 }
 
 main();

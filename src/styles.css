@@ -60,3 +60,8 @@
   left: 0;
   margin: 0 40px;
 }
+
+.sprite.right {
+  left: auto;
+  right: 0;
+}
