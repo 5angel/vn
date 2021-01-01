@@ -22,6 +22,8 @@ export default class Scene {
 
     const sprites = actors.map((name) => this.container.getSprite(name));
 
+    this.container.showBubble();
+
     for (let i = 0; i < dialogues.length; ++i) {
       const [index, text, config] = dialogues[i];
       const target = sprites[index];

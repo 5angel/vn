@@ -37,6 +37,7 @@ export default class Container {
     bubbleEl.appendChild(textEl);
 
     titleEl.classList.add("hidden");
+    bubbleEl.classList.add("hidden");
 
     this.bgs = new Array(BG_TOTAL)
       .fill("bg")
@@ -99,12 +100,27 @@ export default class Container {
     containerEl.prepend(image);
   }
 
+  showBubble() {
+    bubbleEl.classList.remove("hidden");
+  }
+
+  hideBubble() {
+    bubbleEl.classList.add("hidden");
+  }
+
   setText(text: string) {
     textEl.innerText = text;
   }
 
   setTitle(title: string) {
     titleEl.innerText = title;
-    titleEl.classList.remove("hidden");
+    const { classList: list } = titleEl;
+    const hidden = list.contains("hidden");
+
+    if (title !== "" && hidden) {
+      list.remove("hidden");
+    } else if (title === "" && !hidden) {
+      list.add("hidden");
+    }
   }
 }
