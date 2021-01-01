@@ -25,6 +25,7 @@ export default class Sprite {
   private direction: Direction = Direction.LEFT;
   private image: HTMLImageElement = null;
   private phrase: string = null;
+  private entered: boolean = false;
   private active: boolean = false;
 
   constructor({ name, title }) {
@@ -45,18 +46,25 @@ export default class Sprite {
     return DIRECTIONS[this.direction];
   }
 
+  isInScene() {
+    return this.entered;
+  }
+
   isActive() {
     return this.active;
   }
 
   enter(): Promise<void> {
     return new Promise((resolve) => {
-      this.active = true;
+      this.entered = true;
 
       const direction = this.getDirection();
       const animation = `enter-${direction}`;
+
       this.image.classList.add(animation);
       this.image.classList.add(direction);
+      this.setActive(true);
+
       Container.getInstance().getElement().appendChild(this.image);
 
       const onAnimationEnd = () => {
@@ -70,8 +78,21 @@ export default class Sprite {
   }
 
   leave() {
-    this.active = false;
+    this.entered = false;
+    this.setActive(false);
     this.image.parentNode.removeChild(this.image);
+  }
+
+  setActive(value: boolean) {
+    const { classList: list } = this.image;
+
+    if (value) {
+      this.active = true;
+      list.add("active");
+    } else {
+      this.active = false;
+      list.remove("active");
+    }
   }
 
   private sayTimeout(resolve: () => void, offset: number = 1) {
@@ -84,11 +105,17 @@ export default class Sprite {
         this.sayTimeout(resolve, offset + step);
       }, TEXT_SPEED);
     } else {
-      setTimeout(resolve, 500);
+      setTimeout(() => {
+        resolve();
+      }, 500);
     }
   }
 
   say(phrase: string): Promise<void> {
+    if (!this.active) {
+      this.setActive(true);
+    }
+
     this.phrase = phrase;
 
     Container.getInstance().setTitle(this.title);

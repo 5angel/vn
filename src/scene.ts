@@ -28,11 +28,13 @@ export default class Scene {
       const [index, text, config] = dialogues[i];
       const target = sprites[index];
 
+      sprites.forEach((item) => item.setActive(false));
+
       if (config != null) {
         target.applyAction(config);
       }
 
-      if (!target.isActive()) {
+      if (!target.isInScene()) {
         await target.enter();
       }
 
