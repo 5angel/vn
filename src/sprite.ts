@@ -1,6 +1,6 @@
-import Scene from "./scene";
+import Container from "./container";
 
-enum Direction {
+export enum Direction {
   LEFT,
   RIGHT,
   MIDDLE,
@@ -9,6 +9,9 @@ enum Direction {
 export type SpriteConfig = {
   name: string;
   title: string;
+};
+
+export type ActionConfig = {
   direction: Direction;
 };
 
@@ -19,14 +22,14 @@ const TEXT_SPEED = 50;
 export default class Sprite {
   private name: string = null;
   private title: string = null;
-  private direction: Direction = null;
+  private direction: Direction = Direction.LEFT;
   private image: HTMLImageElement = null;
   private phrase: string = null;
+  private active: boolean = false;
 
-  constructor({ name, title, direction = Direction.LEFT }) {
+  constructor({ name, title }) {
     this.name = name;
     this.title = title;
-    this.direction = direction;
   }
 
   getImage() {
@@ -42,22 +45,32 @@ export default class Sprite {
     return DIRECTIONS[this.direction];
   }
 
-  enter() {
-    const direction = this.getDirection();
-    const animation = `enter-${direction}`;
-    this.image.classList.add(animation);
-    this.image.classList.add(direction);
-    Scene.getInstance().getElement().appendChild(this.image);
-
-    const onAnimationEnd = () => {
-      this.image.classList.remove(animation);
-      this.image.removeEventListener("animationend", onAnimationEnd);
-    };
-
-    this.image.addEventListener("animationend", onAnimationEnd);
+  isActive() {
+    return this.active;
   }
 
-  leave(sprite: Sprite) {
+  enter(): Promise<void> {
+    return new Promise((resolve) => {
+      this.active = true;
+
+      const direction = this.getDirection();
+      const animation = `enter-${direction}`;
+      this.image.classList.add(animation);
+      this.image.classList.add(direction);
+      Container.getInstance().getElement().appendChild(this.image);
+
+      const onAnimationEnd = () => {
+        this.image.classList.remove(animation);
+        this.image.removeEventListener("animationend", onAnimationEnd);
+        resolve();
+      };
+
+      this.image.addEventListener("animationend", onAnimationEnd);
+    });
+  }
+
+  leave() {
+    this.active = false;
     this.image.parentNode.removeChild(this.image);
   }
 
@@ -67,21 +80,27 @@ export default class Sprite {
       setTimeout(() => {
         const text = this.phrase.slice(0, offset);
         const step = this.phrase[offset + 1] === " " ? 2 : 1;
-        Scene.getInstance().setText(text);
+        Container.getInstance().setText(text);
         this.sayTimeout(resolve, offset + step);
       }, TEXT_SPEED);
     } else {
-      resolve();
+      setTimeout(resolve, 500);
     }
   }
 
   say(phrase: string): Promise<void> {
     this.phrase = phrase;
 
-    Scene.getInstance().setTitle(this.title);
+    Container.getInstance().setTitle(this.title);
 
     return new Promise((resolve) => {
       this.sayTimeout(resolve);
     });
+  }
+
+  applyAction({ direction }: ActionConfig) {
+    if (direction != null) {
+      this.direction = direction;
+    }
   }
 }

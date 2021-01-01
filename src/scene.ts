@@ -1,110 +1,45 @@
-import Sprite, { SpriteConfig } from "./sprite";
-import { createElement, preloadImage } from "./utils";
+import Container from "./container";
+import Sprite, { Direction, SpriteConfig, ActionConfig } from "./sprite";
 
-type SpriteMap = {
-  [name: string]: Sprite;
+export type Phrase = [number, string, ActionConfig];
+
+export type SceneConfig = {
+  actors: string[];
+  background: string;
+  dialogues: Phrase[];
 };
-
-type BgMap = {
-  [name: string]: HTMLImageElement;
-};
-
-const BG_TOTAL = 1;
-
-const containerEl = createElement("container");
-const bubbleEl = createElement("bubble");
-const titleEl = createElement("title");
-const textEl = createElement("text");
-const sceneEl = createElement("scene");
+const config: SpriteConfig[] = require("./data/sprites.json");
 
 export default class Scene {
-  private bgs: BgMap = null;
-  private sprites: SpriteMap = null;
+  private container: Container = null;
 
-  static instance: Scene = null;
-
-  static getInstance() {
-    return this.instance;
+  constructor() {
+    this.container = new Container(config);
   }
 
-  constructor(sprites: SpriteConfig[]) {
-    document.body.appendChild(containerEl);
+  async start({ actors, background, dialogues }: SceneConfig) {
+    this.container.setBackground(background);
 
-    containerEl.appendChild(sceneEl);
-    containerEl.appendChild(bubbleEl);
+    const sprites = actors.map((name) => this.container.getSprite(name));
 
-    bubbleEl.appendChild(titleEl);
-    bubbleEl.appendChild(textEl);
+    for (let i = 0; i < dialogues.length; ++i) {
+      const [index, text, config] = dialogues[i];
+      const target = sprites[index];
 
-    titleEl.classList.add("hidden");
+      if (config != null) {
+        target.applyAction(config);
+      }
 
-    this.bgs = new Array(BG_TOTAL)
-      .fill("bg")
-      .map((name, index) => `${name}${index + 1}`)
-      .reduce((result, name) => {
-        result[name] = null;
-        return result;
-      }, {});
+      if (!target.isActive()) {
+        await target.enter();
+      }
 
-    this.sprites = sprites.reduce((result, config) => {
-      const sprite = new Sprite(config);
-      result[config.name] = sprite;
-      return result;
-    }, {});
-
-    Scene.instance = this;
-  }
-
-  async preloadBgs() {
-    const list = Object.keys(this.bgs);
-
-    for (let i = 0; i < list.length; ++i) {
-      const name = list[i];
-      const image = await preloadImage(name, "jpg");
-      this.bgs[name] = image;
+      await target.say(text);
     }
   }
 
-  async preloadSprites() {
-    const list = Object.keys(this.sprites);
-
-    for (let i = 0; i < list.length; ++i) {
-      const name = list[i];
-      const image = await preloadImage(name);
-      const sprite = this.sprites[name];
-
-      sprite.setImage(image);
-    }
-  }
-
-  getElement() {
-    return sceneEl;
-  }
-
-  getSprite(name: string) {
-    return this.sprites[name];
-  }
-
-  setBackground(name: string) {
-    const previous = document.getElementById("bg");
-
-    if (previous != null) {
-      previous.id = "";
-      previous.parentNode.removeChild(previous);
-    }
-
-    const image = this.bgs[name];
-    image.id = "bg";
-
-    containerEl.prepend(image);
-  }
-
-  setText(text: string) {
-    textEl.innerText = text;
-  }
-
-  setTitle(title: string) {
-    titleEl.innerText = title;
-    titleEl.classList.remove("hidden");
+  async preload() {
+    await this.container.preloadBgs();
+    await this.container.preloadSprites();
   }
 }
