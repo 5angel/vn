@@ -1,4 +1,4 @@
-import { ImageMap } from "./utils";
+import Scene from "./scene";
 
 enum Direction {
   LEFT,
@@ -6,19 +6,22 @@ enum Direction {
   MIDDLE,
 }
 
+export type SpriteConfig = {
+  name: string;
+  title: string;
+  direction: Direction;
+};
+
 const DIRECTIONS = ["left", "right", "middle"];
+
+const TEXT_SPEED = 50;
 
 export default class Sprite {
   private name: string = null;
   private title: string = null;
   private direction: Direction = null;
   private image: HTMLImageElement = null;
-
-  private static resources: ImageMap = null;
-
-  static init(data: ImageMap) {
-    Sprite.resources = data;
-  }
+  private phrase: string = null;
 
   constructor({ name, title, direction = Direction.LEFT }) {
     this.name = name;
@@ -26,29 +29,59 @@ export default class Sprite {
     this.direction = direction;
   }
 
-  private getScene() {
-    return document.getElementById("scene");
+  getImage() {
+    return this.image;
   }
 
-  private getImage() {
-    return Sprite.resources[this.name];
+  setImage(image: HTMLImageElement) {
+    this.image = image;
+    image.classList.add("sprite");
   }
 
-  private getDirection() {
+  getDirection() {
     return DIRECTIONS[this.direction];
   }
 
   enter() {
-    this.image = this.getImage();
+    const direction = this.getDirection();
+    const animation = `enter-${direction}`;
+    this.image.classList.add(animation);
+    this.image.classList.add(direction);
+    Scene.getInstance().getElement().appendChild(this.image);
 
-    const list = this.image.classList;
+    const onAnimationEnd = () => {
+      this.image.classList.remove(animation);
+      this.image.removeEventListener("animationend", onAnimationEnd);
+    };
 
-    list.add("sprite", this.getDirection());
-
-    this.getScene().appendChild(this.image);
+    this.image.addEventListener("animationend", onAnimationEnd);
   }
 
-  leave() {
+  leave(sprite: Sprite) {
     this.image.parentNode.removeChild(this.image);
+  }
+
+  private sayTimeout(resolve: () => void, offset: number = 1) {
+    const total = this.phrase.length;
+    if (offset <= total) {
+      setTimeout(() => {
+        const text = this.phrase.slice(0, offset);
+        const step = this.phrase[offset + 1] === " " ? 2 : 1;
+        Scene.getInstance().setText(text);
+        this.sayTimeout(resolve, offset + step);
+      }, TEXT_SPEED);
+    } else {
+      resolve();
+    }
+  }
+
+  say(phrase: string): Promise<void> {
+    this.phrase = phrase;
+
+    Scene.getInstance().setTitle(this.title);
+
+    return new Promise((resolve) => {
+      this.sayTimeout(resolve);
+    });
   }
 }

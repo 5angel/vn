@@ -1,51 +1,27 @@
 import "./styles.css";
 
-import { preloadResources } from "./utils";
-import Sprite from "./sprite";
+import { SpriteConfig } from "./sprite";
+import Scene from "./scene";
 
-const sprites: {
-  [name: string]: Sprite;
-} = {};
-
-const config: Array<any> = require("./sprites.json");
-
-function createElement(id: string): HTMLDivElement {
-  const element = document.createElement("div");
-  element.id = id;
-  return element;
-}
+const config: SpriteConfig[] = require("./sprites.json");
 
 async function main() {
-  const names = config.map(({ name }) => name);
-  const resources = await preloadResources("bg1.jpg", ...names);
-  Sprite.init(resources);
+  const scene = new Scene(config);
 
-  const container = createElement("container");
-  const bubble = createElement("bubble");
-  const title = createElement("title");
-  const text = createElement("text");
-  const scene = createElement("scene");
+  await scene.preloadBgs();
+  await scene.preloadSprites();
 
-  document.body.appendChild(container);
+  scene.setBackground("bg1");
 
-  const bg: HTMLImageElement = resources["bg1"];
+  setTimeout(async () => {
+    const kosulya = scene.getSprite("kosulya");
+    kosulya.enter();
+    await kosulya.say("Добрый день, какого хуя?");
 
-  container.appendChild(bg);
-  container.appendChild(scene);
-  container.appendChild(bubble);
-
-  bubble.appendChild(title);
-  bubble.appendChild(text);
-
-  config.forEach((data) => {
-    const { name } = data;
-    sprites[name] = new Sprite(data);
-  });
-
-  const kosulya = sprites["kosulya"];
-  const lisa = sprites["lisa"];
-  kosulya.enter();
-  lisa.enter();
+    const lisa = scene.getSprite("lisa");
+    lisa.enter();
+    lisa.say("Слыш");
+  }, 1000);
 }
 
 main();
