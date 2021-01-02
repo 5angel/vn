@@ -56,10 +56,6 @@
   font-size: 22px;
 }
 
-.hidden {
-  display: none;
-}
-
 #title:after {
   content: "";
   position: absolute;
@@ -71,6 +67,33 @@
   border-width: 40px 20px 0 0;
   border-color: black;
   border-right-color: transparent;
+}
+
+@keyframes Blink {
+  0% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+#icon {
+  position: absolute;
+  right: 20px;
+  bottom: 20px;
+  border-style: solid;
+  border-width: 8px 0 8px 16px;
+  border-color: transparent;
+  border-left-color: #eee;
+  animation: Blink 2s steps(1) infinite;
+}
+
+.hidden {
+  display: none;
 }
 
 .sprite {

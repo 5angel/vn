@@ -13,6 +13,7 @@ export default class DOMManager {
   private bubble: HTMLElement;
   private title: HTMLElement;
   private text: HTMLElement;
+  private icon: HTMLElement;
   private scene: HTMLElement;
 
   constructor() {
@@ -30,6 +31,7 @@ export default class DOMManager {
     this.bubble = createElement("bubble");
     this.title = createElement("title");
     this.text = createElement("text");
+    this.icon = createElement("icon");
     this.scene = createElement("scene");
 
     document.body.appendChild(this.container);
@@ -39,6 +41,7 @@ export default class DOMManager {
 
     this.bubble.appendChild(this.title);
     this.bubble.appendChild(this.text);
+    this.bubble.appendChild(this.icon);
 
     this.title.classList.add("hidden");
     this.bubble.classList.add("hidden");
@@ -58,14 +61,23 @@ export default class DOMManager {
     this.container.prepend(image);
   }
 
-  toggleSpeech(value: boolean) {
-    const { classList: list } = this.bubble;
+  private toggleElement(element: HTMLElement, value: boolean) {
+    const { classList: list } = element;
+    const active = list.contains("hidden");
 
-    if (!value) {
+    if (!value && !active) {
       list.add("hidden");
-    } else {
+    } else if (value && active) {
       list.remove("hidden");
     }
+  }
+
+  toggleSpeech(value: boolean) {
+    this.toggleElement(this.bubble, value);
+  }
+
+  toggleIcon(value: boolean) {
+    this.toggleElement(this.icon, value);
   }
 
   setText(text: string) {
@@ -86,5 +98,9 @@ export default class DOMManager {
 
   insert(element: HTMLElement) {
     this.container.appendChild(element);
+  }
+
+  getContainer() {
+    return this.container;
   }
 }

@@ -1,7 +1,6 @@
 import DOMManager from "./DOMManager";
 
 const TEXT_SPEED = 50;
-const TEXT_DELAY = 500;
 
 export default class SpeechBubble {
   static instance: SpeechBubble = new SpeechBubble();
@@ -11,6 +10,7 @@ export default class SpeechBubble {
   }
 
   private text = null;
+  private finished = true;
 
   constructor() {
     if (SpeechBubble.instance != null) {
@@ -21,6 +21,12 @@ export default class SpeechBubble {
   }
 
   private printTimeout(resolve: () => void, offset: number = 1) {
+    if (this.finished) {
+      DOMManager.getInstance().setText(this.text);
+      resolve();
+      return;
+    }
+
     const total = this.text.length;
     if (offset <= total) {
       setTimeout(() => {
@@ -31,17 +37,38 @@ export default class SpeechBubble {
         this.printTimeout(resolve, offset + step);
       }, TEXT_SPEED);
     } else {
-      setTimeout(() => {
-        resolve();
-      }, TEXT_DELAY);
+      resolve();
     }
   }
 
   print(text: string): Promise<void> {
+    const dom = DOMManager.getInstance();
+
+    dom.toggleIcon(false);
+
     this.text = text;
+    this.finished = false;
+
+    new Promise<void>((resolve) => {
+      this.printTimeout(resolve);
+    }).then(() => {
+      this.finished = true;
+      dom.toggleIcon(true);
+    });
+
+    const container = dom.getContainer();
 
     return new Promise((resolve) => {
-      this.printTimeout(resolve);
+      const handleClick = () => {
+        if (this.finished) {
+          container.removeEventListener("click", handleClick);
+          resolve();
+        } else {
+          this.finished = true;
+        }
+      };
+
+      container.addEventListener("click", handleClick);
     });
   }
 }
