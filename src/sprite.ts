@@ -1,4 +1,5 @@
-import Container from "./container";
+import DOMManager from "./DOMManager";
+import SpeechBubble from "./SpeechBubble";
 
 export enum Direction {
   LEFT,
@@ -17,14 +18,11 @@ export type ActionConfig = {
 
 const DIRECTIONS = ["left", "right", "middle"];
 
-const TEXT_SPEED = 50;
-
 export default class Sprite {
   private name: string = null;
   private title: string = null;
   private direction: Direction = Direction.LEFT;
   private image: HTMLImageElement = null;
-  private phrase: string = null;
   private entered: boolean = false;
   private active: boolean = false;
 
@@ -60,15 +58,16 @@ export default class Sprite {
 
       const direction = this.getDirection();
       const animation = `enter-${direction}`;
+      const { classList: list } = this.image;
 
-      this.image.classList.add(animation);
-      this.image.classList.add(direction);
+      list.add(animation);
+      list.add(direction);
       this.setActive(true);
 
-      Container.getInstance().getElement().appendChild(this.image);
+      DOMManager.getInstance().insert(this.image);
 
       const onAnimationEnd = () => {
-        this.image.classList.remove(animation);
+        list.remove(animation);
         this.image.removeEventListener("animationend", onAnimationEnd);
         resolve();
       };
@@ -95,34 +94,14 @@ export default class Sprite {
     }
   }
 
-  private sayTimeout(resolve: () => void, offset: number = 1) {
-    const total = this.phrase.length;
-    if (offset <= total) {
-      setTimeout(() => {
-        const text = this.phrase.slice(0, offset);
-        const step = this.phrase[offset + 1] === " " ? 2 : 1;
-        Container.getInstance().setText(text);
-        this.sayTimeout(resolve, offset + step);
-      }, TEXT_SPEED);
-    } else {
-      setTimeout(() => {
-        resolve();
-      }, 500);
-    }
-  }
-
   say(phrase: string): Promise<void> {
     if (!this.active) {
       this.setActive(true);
     }
 
-    this.phrase = phrase;
+    DOMManager.getInstance().setTitle(this.title);
 
-    Container.getInstance().setTitle(this.title);
-
-    return new Promise((resolve) => {
-      this.sayTimeout(resolve);
-    });
+    return SpeechBubble.getInstance().print(phrase);
   }
 
   applyAction({ direction }: ActionConfig) {

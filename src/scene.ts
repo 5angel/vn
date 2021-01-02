@@ -1,5 +1,6 @@
-import Container from "./container";
-import Sprite, { Direction, SpriteConfig, ActionConfig } from "./sprite";
+import DOMManager from "./DOMManager";
+import ResourceManager from "./ResourceManager";
+import { ActionConfig } from "./Sprite";
 
 export type Phrase = [number, string, ActionConfig];
 
@@ -8,21 +9,17 @@ export type SceneConfig = {
   background: string;
   dialogues: Phrase[];
 };
-const config: SpriteConfig[] = require("./data/sprites.json");
 
 export default class Scene {
-  private container: Container = null;
-
-  constructor() {
-    this.container = new Container(config);
-  }
+  constructor() {}
 
   async start({ actors, background, dialogues }: SceneConfig) {
-    this.container.setBackground(background);
+    const dom = DOMManager.getInstance();
+    const resources = ResourceManager.getInstance();
+    const sprites = actors.map((name) => resources.getSprite(name));
 
-    const sprites = actors.map((name) => this.container.getSprite(name));
-
-    this.container.showBubble();
+    dom.setBackground(background);
+    dom.toggleSpeech(true);
 
     for (let i = 0; i < dialogues.length; ++i) {
       const [index, text, config] = dialogues[i];
@@ -40,10 +37,5 @@ export default class Scene {
 
       await target.say(text);
     }
-  }
-
-  async preload() {
-    await this.container.preloadBgs();
-    await this.container.preloadSprites();
   }
 }
