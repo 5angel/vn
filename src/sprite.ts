@@ -1,6 +1,5 @@
 import DOMManager from "./DOMManager";
 import SpeechBubble from "./SpeechBubble";
-import { createElement } from "./utils";
 
 export enum Direction {
   LEFT,
@@ -23,7 +22,7 @@ export type ActionConfig = {
 };
 
 const DIRECTIONS = ["left", "right", "middle"];
-const EMOTES = [null, "angry"];
+const EMOTES = [null, "angry", "nervous"];
 
 export default class Sprite {
   private element: HTMLElement = null;
@@ -40,7 +39,8 @@ export default class Sprite {
     this.title = title;
     this.element = document.createElement("div");
 
-    this.element.classList.add("sprite", this.name);
+    this.element.classList.add("sprite");
+    this.element.id = this.name;
   }
 
   getImage() {
@@ -74,18 +74,17 @@ export default class Sprite {
     return new Promise((resolve) => {
       this.entered = true;
 
-      const direction = this.getDirection();
-      const animation = `enter-${direction}`;
+      const direction = `to-${this.getDirection()}`;
       const { classList: list } = this.element;
 
-      list.add(animation);
+      list.add("enter");
       list.add(direction);
       this.setActive(true);
 
       DOMManager.getInstance().insert(this.element);
 
       const onAnimationEnd = () => {
-        list.remove(animation);
+        list.remove("enter");
         this.element.removeEventListener("animationend", onAnimationEnd);
         resolve();
       };

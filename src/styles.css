@@ -2,6 +2,21 @@
   box-sizing: border-box;
 }
 
+img {
+  -webkit-user-drag: none;
+  -khtml-user-drag: none;
+  -moz-user-drag: none;
+  -o-user-drag: none;
+}
+
+#container {
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -o-user-select: none;
+  user-select: none;
+}
+
 #container,
 #scene {
   overflow: hidden;
@@ -111,11 +126,11 @@
   filter: grayscale(0);
 }
 
-.sprite.left {
+.sprite.to-left {
   left: 40px;
 }
 
-.sprite.right {
+.sprite.to-right {
   left: auto;
   right: 40px;
 }
@@ -129,6 +144,15 @@
   }
   100% {
     transform: rotate(0deg);
+  }
+}
+
+@keyframes Nervous {
+  from {
+    transform: translateY(-20px);
+  }
+  to {
+    transform: translateY(0);
   }
 }
 
@@ -146,8 +170,18 @@ div[class*="emote"]:after {
   animation: Angry 2s steps(1) infinite;
 }
 
-.lisa.emote-angry:after {
+.emote-nervous:after {
+  animation: Nervous 300ms ease-out 1;
+  background-position: 80px 0;
+}
+
+#lisa.emote-angry:after {
   top: 64px;
+  right: 128px;
+}
+
+#lisa.emote-nervous:after {
+  top: 40px;
   right: 128px;
 }
 
@@ -162,10 +196,6 @@ div[class*="emote"]:after {
   }
 }
 
-.sprite.enter-left {
-  animation: 300ms ease-out EnterFromLeft;
-}
-
 @keyframes EnterFromRight {
   from {
     right: 0;
@@ -177,6 +207,10 @@ div[class*="emote"]:after {
   }
 }
 
-.sprite.enter-right {
+.sprite.enter.to-left {
+  animation: 300ms ease-out EnterFromLeft;
+}
+
+.sprite.enter.to-right {
   animation: 300ms ease-out EnterFromRight;
 }
