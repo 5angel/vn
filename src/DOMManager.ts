@@ -97,7 +97,7 @@ export default class DOMManager {
   }
 
   insert(element: HTMLElement) {
-    this.container.appendChild(element);
+    this.scene.appendChild(element);
   }
 
   getContainer() {

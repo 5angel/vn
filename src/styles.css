@@ -120,6 +120,37 @@
   right: 40px;
 }
 
+@keyframes Angry {
+  0% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(8deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+div[class*="emote"]:after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 80px;
+  height: 80px;
+  background-image: url("assets/emotes.png");
+}
+
+.emote-angry:after {
+  animation: Angry 2s steps(1) infinite;
+}
+
+.lisa.emote-angry:after {
+  top: 64px;
+  right: 128px;
+}
+
 @keyframes EnterFromLeft {
   from {
     transform: translateX(-100%);

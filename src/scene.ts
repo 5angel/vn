@@ -1,6 +1,6 @@
 import DOMManager from "./DOMManager";
 import ResourceManager from "./ResourceManager";
-import { ActionConfig } from "./Sprite";
+import { ActionConfig } from "./sprite";
 
 export type Phrase = [number, string, ActionConfig];
 

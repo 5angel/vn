@@ -18,11 +18,20 @@ module.exports = {
         use: ["style-loader", "css-loader"],
         exclude: /node_modules/,
       },
+      {
+        test: /\.(png|jpg|gif)$/i,
+        use: ["url-loader"],
+      },
     ],
   },
 
+
+
   resolve: {
     extensions: [".ts", ".js"],
+    alias: {
+      assets: path.resolve(__dirname, "./assets")
+    },
   },
 
   output: {
