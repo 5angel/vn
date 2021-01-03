@@ -8,7 +8,10 @@ export enum Direction {
 }
 
 export enum Emote {
+  NONE,
   ANGRY,
+  NERVOUS,
+  SHAKE,
 }
 
 export type SpriteConfig = {
@@ -22,7 +25,7 @@ export type ActionConfig = {
 };
 
 const DIRECTIONS = ["left", "right", "middle"];
-const EMOTES = [null, "angry", "nervous"];
+const EMOTES = [null, "angry", "nervous", "shake"];
 
 export default class Sprite {
   private element: HTMLElement = null;

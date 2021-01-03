@@ -156,6 +156,21 @@ img {
   }
 }
 
+@keyframes Shake {
+  0% {
+    transform: translateX(2px) translateY(0px);
+  }
+  25% {
+    transform: translateX(0px) translateY(2px);
+  }
+  50% {
+    transform: translateX(2px) translateY(2px);
+  }
+  100% {
+    transform: translateX(0px) translateY(2px);
+  }
+}
+
 div[class*="emote"]:after {
   content: "";
   position: absolute;
@@ -166,7 +181,8 @@ div[class*="emote"]:after {
   background-image: url("assets/emotes.png");
 }
 
-.emote-angry:after {
+.emote-angry:after,
+.emote-shake:after {
   animation: Angry 2s steps(1) infinite;
 }
 
@@ -175,7 +191,12 @@ div[class*="emote"]:after {
   background-position: 80px 0;
 }
 
-#lisa.emote-angry:after {
+.emote-shake {
+  animation: Shake 200ms steps(4) infinite;
+}
+
+#lisa.emote-angry:after,
+#lisa.emote-shake:after {
   top: 64px;
   right: 128px;
 }
