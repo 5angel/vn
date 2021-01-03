@@ -13,7 +13,7 @@ const BG_TOTAL = 1;
 export default class ResourceManager {
   private bgs: ResourceMap<HTMLImageElement> = null;
   private sprites: ResourceMap<Sprite> = null;
-  private sounds: ResourceMap<HTMLAudioElement[]> = {};
+  private sounds: ResourceMap<HTMLAudioElement> = {};
 
   private static instance = new ResourceManager();
 
@@ -57,7 +57,7 @@ export default class ResourceManager {
     return this.bgs[name];
   }
 
-  getSounds(name: string) {
+  getSound(name: string) {
     return this.sounds[name];
   }
 
@@ -67,7 +67,7 @@ export default class ResourceManager {
 
     for (let i = 0; i < keys.length; ++i) {
       const name = keys[i];
-      this.sounds[name] = await this.preloadSoundsFor(name);
+      this.sounds[name] = await this.preloadSoundFor(name);
       const sprite = this.sprites[name];
       sprite.setImage(images[name]);
     }
@@ -75,18 +75,13 @@ export default class ResourceManager {
     this.bgs = await this.preloadSpritesFor(this.bgs, "jpg");
   }
 
-  private async preloadSoundsFor(name: string): Promise<HTMLAudioElement[]> {
+  private async preloadSoundFor(name: string): Promise<HTMLAudioElement> {
     try {
-      const total = 3;
-      const result = [];
-      for (let index = 0; index < total; ++index) {
-        const audio = await preloadSound(`${name}${index + 1}`);
-        result.push(audio);
-      }
-      return result;
+      const audio = await preloadSound(name);
+      return audio;
     } catch (error) {
       console.warn(`No sounds found for "${name}"`);
-      return [];
+      return null;
     }
   }
 

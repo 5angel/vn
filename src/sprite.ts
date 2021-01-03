@@ -156,7 +156,7 @@ export default class Sprite {
 
   private async startSpeech() {
     try {
-      await this.playSound();
+      this.playSound();
       const finished = SpeechBubble.getInstance().isFinished();
       if (!finished) {
         this.startSpeech();
@@ -166,24 +166,9 @@ export default class Sprite {
     }
   }
 
-  private playSound(): Promise<void> {
-    return new Promise((resolve, reject) => {
-      const sounds = ResourceManager.getInstance().getSounds(this.name);
+  private playSound() {
+    const audio = ResourceManager.getInstance().getSound(this.name);
 
-      if (sounds.length > 0) {
-        const index = Math.floor(Math.random() * sounds.length);
-        const audio = sounds[index];
-
-        setTimeout(() => {
-          audio.currentTime = 0;
-          resolve();
-        }, 200);
-
-        sounds.forEach((item) => item.pause());
-        audio.play();
-      } else {
-        reject();
-      }
-    });
+    audio.play();
   }
 }
