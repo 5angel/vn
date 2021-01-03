@@ -1,4 +1,5 @@
 import DOMManager from "./DOMManager";
+import ResourceManager from "./ResourceManager";
 import SpeechBubble from "./SpeechBubble";
 
 export enum Direction {
@@ -138,6 +139,8 @@ export default class Sprite {
 
     DOMManager.getInstance().setTitle(this.title);
 
+    this.startSpeech();
+
     return SpeechBubble.getInstance().print(phrase);
   }
 
@@ -149,5 +152,38 @@ export default class Sprite {
     if (emote != null) {
       this.setEmote(emote);
     }
+  }
+
+  private async startSpeech() {
+    try {
+      await this.playSound();
+      const finished = SpeechBubble.getInstance().isFinished();
+      if (!finished) {
+        this.startSpeech();
+      }
+    } catch (error) {
+      console.warn(`No speech sounds for "${this.name}"`);
+    }
+  }
+
+  private playSound(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      const sounds = ResourceManager.getInstance().getSounds(this.name);
+
+      if (sounds.length > 0) {
+        const index = Math.floor(Math.random() * sounds.length);
+        const audio = sounds[index];
+
+        setTimeout(() => {
+          audio.currentTime = 0;
+          resolve();
+        }, 200);
+
+        sounds.forEach((item) => item.pause());
+        audio.play();
+      } else {
+        reject();
+      }
+    });
   }
 }

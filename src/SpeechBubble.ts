@@ -20,6 +20,10 @@ export default class SpeechBubble {
     SpeechBubble.instance = this;
   }
 
+  isFinished() {
+    return this.finished;
+  }
+
   private printTimeout(resolve: () => void, offset: number = 1) {
     if (this.finished) {
       DOMManager.getInstance().setText(this.text);
