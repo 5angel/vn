@@ -182,6 +182,21 @@ img {
   }
 }
 
+@keyframes What {
+  0% {
+    opacity: 1;
+  }
+  25% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
 div[class*="emote"]:after {
   content: "";
   position: absolute;
@@ -212,6 +227,12 @@ div[class*="emote"]:after {
   background-position: -160px 0;
 }
 
+.emote-what:after {
+  opacity: 0;
+  background-position: -240px 0;
+  animation: What 200ms steps(1) 1 300ms;
+}
+
 /* Lisa Emotes */
 
 #lisa.emote-angry:after,
@@ -228,6 +249,11 @@ div[class*="emote"]:after {
 #lisa.emote-sigh:after {
   top: 132px;
   right: 240px;
+}
+
+#lisa.emote-what:after {
+  top: 48px;
+  right: 248px;
 }
 
 @keyframes EnterFromLeft {
