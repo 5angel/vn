@@ -171,6 +171,17 @@ img {
   }
 }
 
+@keyframes Sigh {
+  from {
+    opacity: 1;
+    transform: translateX(0px) translateY(0px);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(-20px) translateY(20px);
+  }
+}
+
 div[class*="emote"]:after {
   content: "";
   position: absolute;
@@ -188,12 +199,20 @@ div[class*="emote"]:after {
 
 .emote-nervous:after {
   animation: Nervous 300ms ease-out 1;
-  background-position: 80px 0;
+  background-position: -80px 0;
 }
 
 .emote-shake {
   animation: Shake 200ms steps(4) infinite;
 }
+
+.emote-sigh:after {
+  opacity: 0;
+  animation: Sigh 1000ms ease-out 1 300ms;
+  background-position: -160px 0;
+}
+
+/* Lisa Emotes */
 
 #lisa.emote-angry:after,
 #lisa.emote-shake:after {
@@ -204,6 +223,11 @@ div[class*="emote"]:after {
 #lisa.emote-nervous:after {
   top: 40px;
   right: 128px;
+}
+
+#lisa.emote-sigh:after {
+  top: 132px;
+  right: 240px;
 }
 
 @keyframes EnterFromLeft {
